@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { setSourceMapRange } from 'typescript';
 import './Snake.css';
 
 const Snake: React.FC = () => {
@@ -41,7 +40,7 @@ const Snake: React.FC = () => {
     }
 
     useEffect(() => {
-        //determine relative dimension to construct game
+        //determine relative dimensions of game portal
         if (width >= 800) {
             setDim(width * .35)
         } else if (width < 800) {
@@ -52,6 +51,39 @@ const Snake: React.FC = () => {
         //points
         if (snake[0].part[0] === fruit) {
             setPoints(points + 1)
+            let sneak = [...snake];
+            let firstSection = sneak[0]
+            if (firstSection.direction === 'up') {
+                let y = firstSection.part[0] - 20;
+                if (y < 0) {
+                    firstSection.part.unshift(y + 400);
+                } else {
+                    firstSection.part.unshift(y)
+                }
+            } else if (firstSection.direction === 'right') {
+                let y = firstSection.part[0] + 1;
+                if (y % 20 === 0) {
+                    firstSection.part.unshift(y + - 20);
+                } else {
+                    firstSection.part.unshift(y)
+                }
+            } else if (firstSection.direction === 'down') {
+                let y = firstSection.part[0] + 20;
+                if (y >= 400) {
+                    firstSection.part.unshift(y - 400);
+                } else {
+                    firstSection.part.unshift(y)
+                }
+            } else if (firstSection.direction === 'left') {
+                let y = firstSection.part[0] - 1;
+                if (y % 20 === 19) {
+                    firstSection.part.unshift(y + 20);
+                } else {
+                    firstSection.part.unshift(y)
+                }
+            }
+            console.log(sneak)
+            setSnake(sneak)
             setFruit(Math.floor(Math.random() * Math.floor(400)))
         }
 
@@ -132,8 +164,8 @@ const Snake: React.FC = () => {
                 } else if (section.direction === 'up') {
                     section.part.map((x: number, i: number) => {
                         let y = x - 20;
-                        if (y <= 0) {
-                            return section.part[i] = y + 380;
+                        if (y < 0) {
+                            return section.part[i] = y + 400;
                         } else {
                             return section.part[i] = y
                         }
@@ -172,7 +204,7 @@ const Snake: React.FC = () => {
             clearInterval(interval)
             document.removeEventListener('keydown', handleKeydown)
         };
-    }, [width, dim, chunk, snake, direction, points])
+    }, [width, dim, chunk, snake, direction, points, fruit])
 
     return (
         <div className="snake-container">
