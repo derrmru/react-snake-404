@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { setSourceMapRange } from 'typescript';
 import './Snake.css';
 
 const Snake: React.FC = () => {
     const [dim, setDim] = useState<number>(0);
     const [chunk, setChunk] = useState<number>(0);
     const [direction, setDirection] = useState('right');
+    const [fruit, setFruit] = useState<number>(26);
+    const [points, setPoints] = useState<number>(0);
     const width: number = window.innerWidth;
     const countRef = useRef(0);
     const speedRef = useRef(100);
@@ -29,7 +32,10 @@ const Snake: React.FC = () => {
                  }
                 j++
             }
-            addToArr ? arr.push('bang') : arr.push('')
+            addToArr ? 
+                arr.push('bang') : 
+                    i === fruit ? arr.push('fruit') :
+                        arr.push('')
         }
         return arr
     }
@@ -42,6 +48,12 @@ const Snake: React.FC = () => {
             setDim(width * .9);
         }
         setChunk(dim / 20)
+
+        //points
+        if (snake[0].part[0] === fruit) {
+            setPoints(points + 1)
+            setFruit(Math.floor(Math.random() * Math.floor(400)))
+        }
 
         //listen for directions and update snake instructions accordingly
         const handleKeydown = (e: any) => {
@@ -148,7 +160,6 @@ const Snake: React.FC = () => {
                 return ''
             })
             setSnake(sneak)
-            console.log(snake)
 
             //incrementally speed up every minute
             if (countRef.current % 600 === 0) {
@@ -161,7 +172,7 @@ const Snake: React.FC = () => {
             clearInterval(interval)
             document.removeEventListener('keydown', handleKeydown)
         };
-    }, [width, dim, chunk, snake, direction])
+    }, [width, dim, chunk, snake, direction, points])
 
     return (
         <div className="snake-container">
@@ -175,11 +186,19 @@ const Snake: React.FC = () => {
                                 key={'piece' + i}
                                 style={piece === 'bang' ? 
                                         {width: chunk, height: chunk, backgroundColor: '#248ec2'} : 
-                                            {width: chunk, height: chunk}}
+                                            piece === 'fruit' ?
+                                                {width: chunk, height: chunk, backgroundColor: 'red'} :
+                                                    {width: chunk, height: chunk}}
                                 >
                             </div>
                         })
                     }
+            </div>
+            <div 
+                className="point-bar"
+                style={{width: dim}}
+                >
+                    Score: {points}
             </div>
         </div>
     )
