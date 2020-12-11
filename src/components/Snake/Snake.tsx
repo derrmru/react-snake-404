@@ -1,7 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Snake.css';
 
-const Snake: React.FC = () => {
+interface Props {
+    color1: string,
+    color2: string,
+    backgroundColor: string
+}
+
+const Snake: React.FC<Props> = (props) => {
     const [dim, setDim] = useState<number>(0);
     const [chunk, setChunk] = useState<number>(0);
     const [direction, setDirection] = useState('right');
@@ -226,16 +232,16 @@ const Snake: React.FC = () => {
         <div className="snake-container">
             <div   
                 className="game-border"
-                style={{width: dim, height: dim}}
+                style={{width: dim, height: dim, backgroundColor: props.backgroundColor}}
                 >
                     {
                         pieces().map((piece, i) => {
                             return <div
                                 key={'piece' + i}
                                 style={piece === 'bang' ? 
-                                        {width: chunk, height: chunk, backgroundColor: '#248ec2'} : 
+                                        {width: chunk, height: chunk, backgroundColor: props.color1} : 
                                             piece === 'fruit' ?
-                                                {width: chunk, height: chunk, backgroundColor: 'red'} :
+                                                {width: chunk, height: chunk, backgroundColor: props.color2} :
                                                     {width: chunk, height: chunk}}
                                 >
                             </div>
@@ -259,7 +265,7 @@ const Snake: React.FC = () => {
                 className="point-bar"
                 style={{width: dim}}
                 >
-                    <div>Score: {points}</div>
+                    <div style={{color: props.color2}}>Score: {points}</div>
             </div>
         </div>
     )

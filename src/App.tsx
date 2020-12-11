@@ -5,7 +5,11 @@ import './App.css';
 const App: React.FC = () => {
   return (
     <div className="App">
-      <Snake />
+      <Snake 
+        color1="#248ec2"
+        color2="#1d355e"
+        backgroundColor="#ebebeb"
+        />
     </div>
   );
 }
