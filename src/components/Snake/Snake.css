@@ -11,9 +11,42 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    position: relative;
 }
 
 .point-bar {
     margin: 20px auto;
     text-align: right;
+}
+
+.game-splash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #00000075;
+}
+
+.game-splash div, button {
+    margin: 20px 0;
+}
+
+.game-splash div {
+    font-size: 60px;
+}
+
+.game-splash button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+.game-splash button:hover {
+    background-color: black;
+    color: white;
+    cursor: pointer;
 }

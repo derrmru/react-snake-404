@@ -7,8 +7,8 @@ const Snake: React.FC = () => {
     const [direction, setDirection] = useState('right');
     const [fruit, setFruit] = useState<number>(26);
     const [points, setPoints] = useState<number>(0);
+    const [game, setGame] = useState<boolean>(false);
     const width: number = window.innerWidth;
-    const countRef = useRef(0);
     const speedRef = useRef(100);
     const [snake, setSnake] = useState<any>([
         {
@@ -16,6 +16,17 @@ const Snake: React.FC = () => {
             part: [186, 185, 184, 183]
         }
     ]);
+
+    const reset = () => {
+        speedRef.current = 100;
+        setPoints(0)
+        setDirection('right')
+        setSnake ([{
+            direction: 'right', 
+            part: [186, 185, 184, 183]
+        }])
+        setGame(false)
+    }
 
     const pieces = () => {//functionally label snake pieces (bang) and return
         let arr = [];
@@ -48,7 +59,7 @@ const Snake: React.FC = () => {
         }
         setChunk(dim / 20)
 
-        //points
+        //points and get longer after eating
         if (snake[0].part[0] === fruit) {
             setPoints(points + 1)
             let sneak = [...snake];
@@ -82,129 +93,134 @@ const Snake: React.FC = () => {
                     firstSection.part.unshift(y)
                 }
             }
-            console.log(sneak)
+            speedRef.current = speedRef.current - 2
             setSnake(sneak)
             setFruit(Math.floor(Math.random() * Math.floor(400)))
         }
 
-        //listen for directions and update snake instructions accordingly
-        const handleKeydown = (e: any) => {
-            let tempSnake: any = [...snake];
-            switch (e.code) {
-                case 'ArrowUp':
-                    if (direction !== 'down' && direction !== 'up') {
-                        setDirection('up')
-                        tempSnake.unshift({
-                            direction: 'up',
-                            part: []
-                        })
-                    }
-                    break;
-                case 'ArrowRight':
-                    if (direction !== 'left' && direction !== 'right') {
-                        setDirection('right')
-                        tempSnake.unshift({
-                            direction: 'right',
-                            part: []
-                        })
-                    }
-                    break;
-                case 'ArrowDown':
-                    if (direction !== 'up' && direction !== 'down') {
-                        setDirection('down')
-                        tempSnake.unshift({
-                            direction: 'down',
-                            part: []
-                        })
-                    }
-                    break;
-                case 'ArrowLeft':
-                    if (direction !== 'right' && direction !== 'left') {
-                        setDirection('left')
-                        tempSnake.unshift({
-                            direction: 'left',
-                            part: []
-                        })
-                    }
-                    break;
-            }
-            setSnake(tempSnake)
+        //gameover if you eat your tail
+        let totalArr: any[] = [];
+        for (let k = 0; k < snake.length; k++) {
+            totalArr = [...totalArr, ...snake[k].part]
         }
-        document.addEventListener('keydown', handleKeydown)
+        let head = snake[0].part[0];
+        totalArr.filter(item => item === head).length >= 2 && setGame(true)
 
-        //event interval
-        const interval = setInterval(() => {
-            countRef.current += 1
-
-            //handle snake piece movement
-            let dupSneak: any = [...snake];
-
-            for (let i = (snake.length - 1); i > 0; i--) {//increment through current snake and reduce to head direction
-                if (dupSneak[i].part.length !== 0) {
-                    let next = dupSneak[i - 1];
-                    let chunk = dupSneak[i].part.shift();
-                    next.part.push(chunk)
-                } else {
-                    dupSneak.pop()
+        if (!game) {//if GAMEOVER pause events
+            //listen for directions and update snake instructions accordingly
+            const handleKeydown = (e: any) => {
+                let tempSnake: any = [...snake];
+                switch (e.code) {
+                    case 'ArrowUp':
+                        if (direction !== 'down' && direction !== 'up') {
+                            setDirection('up')
+                            tempSnake.unshift({
+                                direction: 'up',
+                                part: []
+                            })
+                        }
+                        break;
+                    case 'ArrowRight':
+                        if (direction !== 'left' && direction !== 'right') {
+                            setDirection('right')
+                            tempSnake.unshift({
+                                direction: 'right',
+                                part: []
+                            })
+                        }
+                        break;
+                    case 'ArrowDown':
+                        if (direction !== 'up' && direction !== 'down') {
+                            setDirection('down')
+                            tempSnake.unshift({
+                                direction: 'down',
+                                part: []
+                            })
+                        }
+                        break;
+                    case 'ArrowLeft':
+                        if (direction !== 'right' && direction !== 'left') {
+                            setDirection('left')
+                            tempSnake.unshift({
+                                direction: 'left',
+                                part: []
+                            })
+                        }
+                        break;
                 }
+                setSnake(tempSnake)
             }
+            document.addEventListener('keydown', handleKeydown)
 
-            //perform movement changes to each chunk
-            let sneak: any[] = dupSneak;
-            sneak.map((section: any) => {
-                if (section.direction === 'right') {
-                    section.part.map((x: number, i: number) => {
-                        let y = x + 1;
-                        if (y % 20 === 0) {
-                            return section.part[i] = y - 20;
-                        } else {
-                            return section.part[i] = y
-                        }
-                    })
-                } else if (section.direction === 'up') {
-                    section.part.map((x: number, i: number) => {
-                        let y = x - 20;
-                        if (y < 0) {
-                            return section.part[i] = y + 400;
-                        } else {
-                            return section.part[i] = y
-                        }
-                    })
-                } else if (section.direction === 'left') {
-                    section.part.map((x: number, i: number) => {
-                        let y = x - 1;
-                        if (y % 20 === 19) {
-                            return section.part[i] = y + 20;
-                        } else {
-                            return section.part[i] = y
-                        }
-                    })
-                } else if (section.direction === 'down') {
-                    section.part.map((x: number, i: number) => {
-                        let y = x + 20;
-                        if (y >= 400) {
-                            return section.part[i] = y - 400;
-                        } else {
-                            return section.part[i] = y
-                        }
-                    })
+            //event interval
+            const interval = setInterval(() => {
+
+                //handle snake piece movement
+                let dupSneak: any = [...snake];
+
+                for (let i = (snake.length - 1); i > 0; i--) {//increment through current snake and reduce to head direction
+                    if (dupSneak[i].part.length !== 0) {
+                        let next = dupSneak[i - 1];
+                        let chunk = dupSneak[i].part.shift();
+                        next.part.push(chunk)
+                    } else {
+                        dupSneak.pop()
+                    }
                 }
-                return ''
-            })
-            setSnake(sneak)
 
-            //incrementally speed up every minute
-            if (countRef.current % 600 === 0) {
-                speedRef.current = speedRef.current - 10
-            }
-        }, speedRef.current);
+                //perform movement changes to each chunk
+                let sneak: any[] = dupSneak;
+                sneak.map((section: any) => {
+                    if (section.direction === 'right') {
+                        section.part.map((x: number, i: number) => {
+                            let y = x + 1;
+                            if (y % 20 === 0) {
+                                return section.part[i] = y - 20;
+                            } else {
+                                return section.part[i] = y
+                            }
+                        })
+                    } else if (section.direction === 'up') {
+                        section.part.map((x: number, i: number) => {
+                            let y = x - 20;
+                            if (y < 0) {
+                                return section.part[i] = y + 400;
+                            } else {
+                                return section.part[i] = y
+                            }
+                        })
+                    } else if (section.direction === 'left') {
+                        section.part.map((x: number, i: number) => {
+                            let y = x - 1;
+                            if (y % 20 === 19) {
+                                return section.part[i] = y + 20;
+                            } else {
+                                return section.part[i] = y
+                            }
+                        })
+                    } else if (section.direction === 'down') {
+                        section.part.map((x: number, i: number) => {
+                            let y = x + 20;
+                            if (y >= 400) {
+                                return section.part[i] = y - 400;
+                            } else {
+                                return section.part[i] = y
+                            }
+                        })
+                    }
+                    return ''
+                })
+                setSnake(sneak)
 
-        //remove interval and listeners
-        return () => {
-            clearInterval(interval)
-            document.removeEventListener('keydown', handleKeydown)
-        };
-    }, [width, dim, chunk, snake, direction, points, fruit])
+            }, speedRef.current);
+
+            //remove interval and listeners
+            return () => {
+                clearInterval(interval)
+                document.removeEventListener('keydown', handleKeydown)
+            };
+        }
+    }, [width, dim, chunk, snake, direction, points, fruit, game])
 
     return (
         <div className="snake-container">
@@ -225,12 +241,25 @@ const Snake: React.FC = () => {
                             </div>
                         })
                     }
+                    {
+                        game && <div 
+                            className="game-splash"
+                            style={{height: dim}}
+                            >
+                            <div>Game Over!</div>
+                            <button
+                                onClick={() => reset()}
+                                >
+                                    Play Again
+                            </button>
+                        </div>
+                    }
             </div>
             <div 
                 className="point-bar"
                 style={{width: dim}}
                 >
-                    Score: {points}
+                    <div>Score: {points}</div>
             </div>
         </div>
     )
