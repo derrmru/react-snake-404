@@ -1,0 +1,12 @@
+.snake-container {
+    text-align: center;
+}
+
+.game-border {
+    border: 1px solid black;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
