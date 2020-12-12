@@ -229,7 +229,7 @@ const Snake: React.FC<Props> = (props) => {
     }, [width, dim, chunk, snake, direction, points, fruit, game])
 
     return (
-        <div className="snake-container">
+        <div className="snake-container" id="snake-container">
             <div   
                 className="game-border"
                 style={{width: dim, height: dim, backgroundColor: props.backgroundColor}}
